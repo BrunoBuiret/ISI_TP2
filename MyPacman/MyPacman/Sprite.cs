@@ -104,16 +104,13 @@ namespace MyPacman
         /// Loads graphics resources.
         /// </summary>
         /// <param name="contentManager">Reference to the content manager.</param>
-        /// <param name="assetName">Name of the asset to load for the sprite.</param>
-        public virtual void LoadContent(ContentManager contentManager, String assetName)
-        {
-            this.texture = contentManager.Load<Texture2D>(assetName);
-        }
+        public abstract void LoadContent(ContentManager contentManager);
         
         /// <summary>
         /// 
         /// </summary>
-        public abstract void Update();
+        /// <param name="gameTime"></param>
+        public abstract void Update(GameTime gameTime);
 
         /// <summary>
         /// 
@@ -125,9 +122,6 @@ namespace MyPacman
         /// </summary>
         /// <param name="spriteBatch"></param>
         /// <param name="gameTime"></param>
-        public virtual void Draw(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            spriteBatch.Draw(this.texture, this.position, Color.White);
-        }
+        public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
     }
 }
