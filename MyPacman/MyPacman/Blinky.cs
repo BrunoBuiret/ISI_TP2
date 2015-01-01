@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyPacman
 {
-    class Blinky : Ghost
+    public class Blinky : Ghost
     {
         /// <summary>
         /// 

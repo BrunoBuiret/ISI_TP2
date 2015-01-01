@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyPacman
 {
-    abstract class Ghost : Sprite
+    public abstract class Ghost : Sprite
     {
         /// <summary>
         /// 
@@ -34,6 +34,7 @@ namespace MyPacman
         /// </summary>
         public override void HandleInput()
         {
+            throw new NotSupportedException("Ghosts do not react to user input.");
         }
 
 
@@ -44,7 +45,10 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            if(this.texture != null)
+            {
+                spriteBatch.Draw(this.texture, this.position, Color.Transparent);
+            }
         }
     }
 }

@@ -20,12 +20,32 @@ namespace MyPacman
 
         protected SpriteBatch spriteBatch;
 
-        public enum State : byte {}
+        protected SpriteFont topBarFont;
+
+        protected Texture2D uiTopTexture;
+
+        public const float BLOCK_WIDTH = 20f;
+
+        public const float BLOCK_HEIGHT = 20f;
+
+        protected bool isPaused;
+
+        protected uint currentScore;
+
+        protected uint currentLevel;
+
+        protected byte remainingLives;
 
         public Game()
         {
-            graphics = new GraphicsDeviceManager(this);
+            this.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            // Initialize game vars
+            this.isPaused = true;
+            this.currentScore = 0;
+            this.currentLevel = 1;
+            this.remainingLives = 3;
         }
 
         /// <summary>
@@ -37,7 +57,8 @@ namespace MyPacman
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            this.IsMouseVisible = true;
+            
             base.Initialize();
         }
 
@@ -51,6 +72,8 @@ namespace MyPacman
             this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            this.topBarFont = this.Content.Load<SpriteFont>(@"fonts\topBar");
+            this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
         }
 
         /// <summary>
@@ -74,6 +97,12 @@ namespace MyPacman
                 this.Exit();
 
             // TODO: Add your update logic here
+            if(!this.isPaused)
+            {
+                // Call Ghost.Update()
+
+                // Call Pacman.Update()
+            }
 
             base.Update(gameTime);
         }
@@ -84,10 +113,23 @@ namespace MyPacman
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
+            this.spriteBatch.Begin();
 
+            // Calculate the text dimensions
+            Vector2 scoreDimensions = this.topBarFont.MeasureString(this.currentScore.ToString());
+            Vector2 levelDimensions = this.topBarFont.MeasureString(this.currentLevel.ToString());
+            Vector2 livesDimensions = this.topBarFont.MeasureString(this.remainingLives.ToString());
+
+            // Draw the UI
+            this.spriteBatch.Draw(this.uiTopTexture, Vector2.Zero, Color.White);
+            this.spriteBatch.DrawString(this.topBarFont, this.currentScore.ToString(), new Vector2(30, 2 + (35 - scoreDimensions.Y) / 2), Color.Gold);
+            this.spriteBatch.DrawString(this.topBarFont, this.currentLevel.ToString(), new Vector2(772 - levelDimensions.X, 2 + (35 - levelDimensions.Y) / 2), Color.Gold);
+            this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(377 + (39 - livesDimensions.X) / 2, 23 + (39 - livesDimensions.Y) / 2), Color.Gold);
+
+            this.spriteBatch.End();
             base.Draw(gameTime);
         }
     }

@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyPacman
 {
-    class Pacman : Sprite
+    public class Pacman : Sprite
     {
         /// <summary>
         /// 
