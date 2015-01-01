@@ -16,8 +16,11 @@ namespace MyPacman
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        protected GraphicsDeviceManager graphics;
+
+        protected SpriteBatch spriteBatch;
+
+        public enum State : byte {}
 
         public Game()
         {

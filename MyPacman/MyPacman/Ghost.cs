@@ -9,23 +9,16 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyPacman
 {
-    class Ghost : Sprite
+    abstract class Ghost : Sprite
     {
         /// <summary>
         /// 
         /// </summary>
         public override void Initialize()
         {
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contentManager"></param>
-        public override void LoadContent(ContentManager contentManager)
-        {
-
-        }
 
         /// <summary>
         /// 
@@ -33,14 +26,16 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// 
+        /// Ghosts do not react to user input.
         /// </summary>
         public override void HandleInput()
         {
         }
+
 
         /// <summary>
         /// 
@@ -49,6 +44,7 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            throw new NotImplementedException();
         }
     }
 }

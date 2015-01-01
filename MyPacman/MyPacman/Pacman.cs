@@ -16,6 +16,7 @@ namespace MyPacman
         /// </summary>
         public override void Initialize()
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace MyPacman
         /// <param name="contentManager"></param>
         public override void LoadContent(ContentManager contentManager)
         {
-
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -40,6 +42,7 @@ namespace MyPacman
         /// </summary>
         public override void HandleInput()
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -49,6 +52,7 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            throw new NotImplementedException();
         }
     }
 }

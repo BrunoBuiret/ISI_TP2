@@ -96,6 +96,17 @@ namespace MyPacman
         }
 
         /// <summary>
+        /// Creates a new blank sprite.
+        /// </summary>
+        public Sprite()
+        {
+            this.texture = null;
+            this.position = Vector2.Zero;
+            this.direction = Vector2.Zero;
+            this.speed = 0f;
+        }
+
+        /// <summary>
         /// Initializes the sprite.
         /// </summary>
         public abstract void Initialize();
