@@ -2,7 +2,7 @@ using System;
 
 namespace MyPacman
 {
-#if WINDOWS || XBOX
+#if WINDOWS
     static class Program
     {
         /// <summary>

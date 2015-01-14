@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyPacman
 {
@@ -124,6 +125,11 @@ namespace MyPacman
             this.levelMatrix = levelMatrix;
         }
 
+        public Level(String fileName)
+        {
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -144,10 +150,18 @@ namespace MyPacman
             // Load a door image
             this.doorTexture = contentManager.Load<Texture2D>(@"images\door");
 
-            // Load a pellet image
+            // TODO: Load a pellet image
 
-            // Load an energizer image
+            // TODO: Load an energizer image
 
+        }
+
+        /// <summary>
+        /// Levels do not need to unload any non-graphic resources.
+        /// </summary>
+        public override void UnloadContent()
+        {
+            throw new NotSupportedException("Levels do not need to unload any non-graphic resources.");
         }
 
         /// <summary>
@@ -162,7 +176,7 @@ namespace MyPacman
         /// <summary>
         /// Levels do not react to user input.
         /// </summary>
-        public override void HandleInput()
+        public override void HandleKeyboard(KeyboardState state)
         {
             throw new NotSupportedException("Levels do not react to user input.");
         }
@@ -174,6 +188,7 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         /// 
         /// Draws the level using the matrix and the following formulas :
+        /// 
         ///  * `realX = matrixX * Game.BLOCK_WIDTH`
         ///  * `realY = matrixY * Game.BLOCK_HEIGHT + topBarShift`
         ///  

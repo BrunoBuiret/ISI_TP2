@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyPacman
 {
@@ -19,9 +20,17 @@ namespace MyPacman
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Ghosts do not need to unload any non-graphic content.
+        /// </summary>
+        public override void UnloadContent()
+        {
+            throw new NotSupportedException("Ghosts do not need to unload any non-graphic content.");
+        }
+
 
         /// <summary>
-        /// 
+        /// General AI for the ghosts.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
@@ -32,7 +41,8 @@ namespace MyPacman
         /// <summary>
         /// Ghosts do not react to user input.
         /// </summary>
-        public override void HandleInput()
+        /// <param name="state"></param>
+        public override void HandleKeyboard(KeyboardState state)
         {
             throw new NotSupportedException("Ghosts do not react to user input.");
         }
@@ -47,7 +57,7 @@ namespace MyPacman
         {
             if(this.texture != null)
             {
-                spriteBatch.Draw(this.texture, this.position, Color.Transparent);
+                spriteBatch.Draw(this.texture, this.position, Color.White);
             }
         }
     }

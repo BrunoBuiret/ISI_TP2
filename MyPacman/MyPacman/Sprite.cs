@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyPacman
 {
@@ -112,10 +113,15 @@ namespace MyPacman
         public abstract void Initialize();
 
         /// <summary>
-        /// Loads graphics resources.
+        /// Loads graphic resources.
         /// </summary>
         /// <param name="contentManager">Reference to the content manager.</param>
         public abstract void LoadContent(ContentManager contentManager);
+
+        /// <summary>
+        /// Unloads any non-graphic resources.
+        /// </summary>
+        public abstract void UnloadContent();
         
         /// <summary>
         /// 
@@ -126,7 +132,8 @@ namespace MyPacman
         /// <summary>
         /// 
         /// </summary>
-        public abstract void HandleInput();
+        /// <param name="state"></param>
+        public abstract void HandleKeyboard(KeyboardState state);
 
         /// <summary>
         /// 

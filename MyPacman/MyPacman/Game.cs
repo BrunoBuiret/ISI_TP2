@@ -74,6 +74,8 @@ namespace MyPacman
             // TODO: use this.Content to load your game content here
             this.topBarFont = this.Content.Load<SpriteFont>(@"fonts\topBar");
             this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
+            // TODO: load ghosts content
+            // TODO: load pacman content
         }
 
         /// <summary>
@@ -83,6 +85,8 @@ namespace MyPacman
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            // TODO: unload ghosts content
+            // TODO: unload pacman content
         }
 
         /// <summary>
@@ -92,16 +96,19 @@ namespace MyPacman
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            KeyboardState keyboardState = Keyboard.GetState();
+
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (keyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
 
             // TODO: Add your update logic here
             if(!this.isPaused)
             {
-                // Call Ghost.Update()
-
-                // Call Pacman.Update()
+                // TODO: call every Ghost.HandleKeyboard(keyboardState)
+                // TODO: call every Ghost.Update()
+                // TODO: call Pacman.HandleKeyboard(keyboardState)
+                // TODO: call Pacman.Update()
             }
 
             base.Update(gameTime);
@@ -118,16 +125,18 @@ namespace MyPacman
             // TODO: Add your drawing code here
             this.spriteBatch.Begin();
 
-            // Calculate the text dimensions
+            // Draw the UI
             Vector2 scoreDimensions = this.topBarFont.MeasureString(this.currentScore.ToString());
             Vector2 levelDimensions = this.topBarFont.MeasureString(this.currentLevel.ToString());
             Vector2 livesDimensions = this.topBarFont.MeasureString(this.remainingLives.ToString());
-
-            // Draw the UI
             this.spriteBatch.Draw(this.uiTopTexture, Vector2.Zero, Color.White);
             this.spriteBatch.DrawString(this.topBarFont, this.currentScore.ToString(), new Vector2(30, 2 + (35 - scoreDimensions.Y) / 2), Color.Gold);
             this.spriteBatch.DrawString(this.topBarFont, this.currentLevel.ToString(), new Vector2(772 - levelDimensions.X, 2 + (35 - levelDimensions.Y) / 2), Color.Gold);
             this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(377 + (39 - livesDimensions.X) / 2, 23 + (39 - livesDimensions.Y) / 2), Color.Gold);
+
+            // Draw the ghosts
+
+            // Draw Pacman
 
             this.spriteBatch.End();
             base.Draw(gameTime);

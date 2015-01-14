@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyPacman
 {
@@ -29,6 +30,14 @@ namespace MyPacman
         }
 
         /// <summary>
+        /// Pacman doesn't need to unload non-graphic content.
+        /// </summary>
+        public override void UnloadContent()
+        {
+            throw new NotSupportedException("Pacman doesn't need to unload non-graphic content.");
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
@@ -40,7 +49,8 @@ namespace MyPacman
         /// <summary>
         /// 
         /// </summary>
-        public override void HandleInput()
+        /// <param name="state"></param>
+        public override void HandleKeyboard(KeyboardState state)
         {
             throw new NotImplementedException();
         }
