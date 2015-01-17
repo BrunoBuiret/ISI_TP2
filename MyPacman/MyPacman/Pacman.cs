@@ -58,9 +58,9 @@ namespace MyPacman
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="spriteBatch"></param>
-        /// <param name="gameTime"></param>
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        /// <param name="spriteBatch">Reference to the sprite batch.</param>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             throw new NotImplementedException();
         }

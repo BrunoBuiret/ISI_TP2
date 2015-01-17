@@ -134,6 +134,8 @@ namespace MyPacman
             this.spriteBatch.DrawString(this.topBarFont, this.currentLevel.ToString(), new Vector2(772 - levelDimensions.X, 2 + (35 - levelDimensions.Y) / 2), Color.Gold);
             this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(377 + (39 - livesDimensions.X) / 2, 23 + (39 - livesDimensions.Y) / 2), Color.Gold);
 
+            // Draw the maze
+
             // Draw the ghosts
 
             // Draw Pacman

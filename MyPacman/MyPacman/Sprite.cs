@@ -13,22 +13,22 @@ namespace MyPacman
     public abstract class Sprite
     {
         /// <summary>
-        /// 
+        /// Sprite's texture, or current texture if there are several.
         /// </summary>
         protected Texture2D texture;
 
         /// <summary>
-        /// Position of the sprite.
+        /// Holds the sprite's position.
         /// </summary>
         protected Vector2 position;
 
         /// <summary>
-        /// 
+        /// Holds the sprite's direction if it is moving.
         /// </summary>
         protected Vector2 direction;
 
         /// <summary>
-        /// 
+        /// Holds the speed of the sprite if it is moving.
         /// </summary>
         protected float speed;
 
@@ -126,20 +126,20 @@ namespace MyPacman
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="gameTime"></param>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public abstract void Update(GameTime gameTime);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="state"></param>
+        /// <param name="state">Reference to the current keyboard state.</param>
         public abstract void HandleKeyboard(KeyboardState state);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="spriteBatch"></param>
-        /// <param name="gameTime"></param>
-        public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
+        /// <param name="spriteBatch">Reference to the sprite batch.</param>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
     }
 }

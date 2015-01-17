@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.IO;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -12,6 +14,11 @@ namespace MyPacman
 {
     public class Level : Sprite
     {
+        /// <summary>
+        /// Represents a regex for the header of a level file.
+        /// </summary>
+        protected static const Regex headerRegex = new Regex("MyPacman ([0-9]+)x([0-9]+) level");
+
         /// <summary>
         /// Represents different kinds of blocks which can be found in the level.
         /// </summary>
@@ -125,9 +132,47 @@ namespace MyPacman
             this.levelMatrix = levelMatrix;
         }
 
-        public Level(String fileName)
+        public static Level Load(String filename)
         {
+            if(File.Exists(filename))
+            {
+                try
+                {
+                    String[] lines = File.ReadAllLines(filename);
 
+                    if(lines.Length > 0)
+                    {
+                        Match headerMatch = Level.headerRegex.Match(lines[0]);
+
+                        if(headerMatch.Success && lines.Length == UInt32.Parse(headerMatch.Captures[2].Value) + 1)
+                        {
+                            uint levelWidth = UInt32.Parse(headerMatch.Captures[1].Value);
+                            uint levelHeight = UInt32.Parse(headerMatch.Captures[2].Value);
+                            BlockTypes[,] levelMatrix = new BlockTypes[levelWidth, levelHeight];
+
+                            // TODO: Parse file while being cautious about the dimensions
+
+                            return new Level(levelWidth, levelHeight, levelMatrix);
+                        }
+                        else
+                        {
+                            throw new ArgumentException(String.Format("File \"%s\" isn't valid.", filename));
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException(String.Format("File \"%s\" is empty.", filename));
+                    }
+                }
+                catch(IOException e)
+                {
+                
+                }
+            }
+            else
+            {
+                throw new ArgumentException(String.Format("File \"%s\" doesn't exist.", filename));
+            }
         }
 
         /// <summary>
@@ -184,8 +229,8 @@ namespace MyPacman
         /// <summary>
         /// Draws the level.
         /// </summary>
-        /// <param name="spriteBatch"></param>
-        /// <param name="gameTime"></param>
+        /// <param name="spriteBatch">Reference to the sprite batch.</param>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         /// 
         /// Draws the level using the matrix and the following formulas :
         /// 
@@ -194,7 +239,7 @@ namespace MyPacman
         ///  
         /// Some types of blocks do not need to appear on the window, for example,
         /// startings points 
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             for(uint y = 0; y < this.height; y++)
             {
