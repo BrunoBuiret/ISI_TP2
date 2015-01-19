@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -16,17 +18,19 @@ namespace MyPacman
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
+        /// <summary>
+        /// Holds a reference to the graphics device manager.
+        /// </summary>
         protected GraphicsDeviceManager graphics;
 
+        /// <summary>
+        /// Holds a reference to the sprite batch used to draw.
+        /// </summary>
         protected SpriteBatch spriteBatch;
 
         protected SpriteFont topBarFont;
 
         protected Texture2D uiTopTexture;
-
-        public const float BLOCK_WIDTH = 20f;
-
-        public const float BLOCK_HEIGHT = 20f;
 
         protected bool isPaused;
 
@@ -36,9 +40,14 @@ namespace MyPacman
 
         protected byte remainingLives;
 
+        // DEBUG
+        protected Level debugLevel;
+        // DEBUG
+
         public Game()
         {
             this.graphics = new GraphicsDeviceManager(this);
+            this.graphics.PreferredBackBufferHeight = 640;
             Content.RootDirectory = "Content";
 
             // Initialize game vars
@@ -46,12 +55,23 @@ namespace MyPacman
             this.currentScore = 0;
             this.currentLevel = 1;
             this.remainingLives = 3;
+
+            // DEBUG
+            try
+            {
+                this.debugLevel = Level.Load(@"C:\Users\PtitBlond\Desktop\mypacman-level.lvl");
+            }
+            catch(Exception e)
+            {
+                File.WriteAllText(@"C:\Users\PtitBlond\Desktop\temp.log", String.Format("Failed to load the level: {0}.", e.Message));
+            }
+            // DEBUG
         }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
+        /// related content. Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize()
@@ -76,6 +96,9 @@ namespace MyPacman
             this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
             // TODO: load ghosts content
             // TODO: load pacman content
+
+            // DEBUG
+            this.debugLevel.LoadContent(this.Content);
         }
 
         /// <summary>
@@ -135,6 +158,9 @@ namespace MyPacman
             this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(377 + (39 - livesDimensions.X) / 2, 23 + (39 - livesDimensions.Y) / 2), Color.Gold);
 
             // Draw the maze
+            // DEBUG
+            this.debugLevel.Draw(gameTime, this.spriteBatch);
+            // DEBUG
 
             // Draw the ghosts
 

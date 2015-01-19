@@ -15,11 +15,6 @@ namespace MyPacman
     public class Level : Sprite
     {
         /// <summary>
-        /// Represents a regex for the header of a level file.
-        /// </summary>
-        protected static const Regex headerRegex = new Regex("MyPacman ([0-9]+)x([0-9]+) level");
-
-        /// <summary>
         /// Represents different kinds of blocks which can be found in the level.
         /// </summary>
         public enum BlockTypes : byte
@@ -45,6 +40,36 @@ namespace MyPacman
             /// </summary>
             ENERGIZER
         };
+
+        /// <summary>
+        /// Represents nothing.
+        /// </summary>
+        protected const char CHAR_EMPTY = ' ';
+
+        /// <summary>
+        /// Represents a door only ghosts can go through.
+        /// </summary>
+        protected const char CHAR_DOOR = 'o';
+
+        /// <summary>
+        /// Represents a wall.
+        /// </summary>
+        protected const char CHAR_WALL = '#';
+
+        /// <summary>
+        /// Represents a pellet Pacman has to eat.
+        /// </summary>
+        protected const char CHAR_PELLET = '*';
+
+        /// <summary>
+        /// Represents an energizer Pacman can eat to become stronger.
+        /// </summary>
+        protected const char CHAR_ENERGIZER = '+';
+
+        /// <summary>
+        /// Represents a regex for the header of a level file.
+        /// </summary>
+        protected static readonly Regex HEADER_REGEX;
 
         /// <summary>
         /// Holds the width of the level.
@@ -80,6 +105,14 @@ namespace MyPacman
         /// Holds a texture for an energizer.
         /// </summary>
         protected Texture2D energizerTexture;
+
+        /// <summary>
+        /// Static constructor of a level.
+        /// </summary>
+        static Level()
+        {
+            Level.HEADER_REGEX = new Regex("MyPacman level ([0-9]+)x([0-9]+)");
+        }
 
         /// <summary>
         /// Creates a new level.
@@ -133,9 +166,42 @@ namespace MyPacman
         }
 
         /// <summary>
+        /// Gets or sets a block type in the matrix of a level.
+        /// </summary>
+        /// <param name="x">Abscissa of the block.</param>
+        /// <param name="y">Ordinate of the block</param>
+        public BlockTypes this[uint x, uint y]
+        {
+            get
+            {
+                if(x < this.width && y < this.height)
+                {
+                    return this.levelMatrix[x,y];
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(String.Format("Couldn't access cell %d,%d because it is out of range.", x, y));
+                }
+            }
+
+            set
+            {
+                if(x < this.width && y < this.height)
+                {
+                    this.levelMatrix[x, y] = value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(String.Format("Couldn't change cell %d,%d because it is out of range.", x, y));
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads a level from a file.
         /// </summary>
         /// <param name="filename">Path of the file to load.</param>
+        /// <returns>Reference to the loaded level.</returns>
         public static Level Load(String filename)
         {
             if(File.Exists(filename))
@@ -146,21 +212,73 @@ namespace MyPacman
 
                     if(lines.Length > 0)
                     {
-                        Match headerMatch = Level.headerRegex.Match(lines[0]);
+                        Match headerMatch = Level.HEADER_REGEX.Match(lines[0]);
 
-                        if(headerMatch.Success && lines.Length == UInt32.Parse(headerMatch.Captures[2].Value) + 1)
+                        if(headerMatch.Success)
                         {
-                            uint levelWidth = UInt32.Parse(headerMatch.Captures[1].Value);
-                            uint levelHeight = UInt32.Parse(headerMatch.Captures[2].Value);
-                            BlockTypes[,] levelMatrix = new BlockTypes[levelWidth, levelHeight];
+                            for(int i = 0, j = headerMatch.Groups.Count; i < j; i++)
+                                File.AppendAllText(@"C:\Users\PtitBlond\Desktop\matches.log", headerMatch.Groups[i].ToString() + "\n");
 
-                            // TODO: Parse file while being cautious about the dimensions
+                            if(lines.Length == UInt32.Parse(headerMatch.Groups[2].Value) + 1)
+                            {
+                                uint levelWidth = UInt32.Parse(headerMatch.Groups[1].Value);
+                                uint levelHeight = UInt32.Parse(headerMatch.Groups[2].Value);
+                                BlockTypes[,] levelMatrix = new BlockTypes[levelWidth, levelHeight];
 
-                            return new Level(levelWidth, levelHeight, levelMatrix);
+                                // TODO: Parse file while being cautious about the dimensions
+                                for(int y = 0; y < levelHeight; y++)
+                                {
+                                    String s = lines[y + 1];
+
+                                    if (s.Length == levelWidth)
+                                    {
+                                        for(int x = 0; x < levelWidth; x++)
+                                        {
+                                            char c = s[x];
+
+                                            switch(c)
+                                            {
+                                                case CHAR_EMPTY:
+                                                    levelMatrix[x, y] = BlockTypes.EMPTY;
+                                                break;
+
+                                                case CHAR_DOOR:
+                                                    levelMatrix[x, y] = BlockTypes.DOOR;
+                                                break;
+
+                                                case CHAR_WALL:
+                                                    levelMatrix[x, y] = BlockTypes.WALL;
+                                                break;
+
+                                                case CHAR_PELLET:
+                                                    levelMatrix[x, y] = BlockTypes.PELLET;
+                                                break;
+
+                                                case CHAR_ENERGIZER:
+                                                    levelMatrix[x, y] = BlockTypes.ENERGIZER;
+                                                break;
+
+                                                default:
+                                                    throw new ArgumentException(String.Format("File \"%s\" isn't valid: char %c at line %d column %d isn't valid.", filename, c, y + 2, x + 1));
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new ArgumentException(String.Format("File \"%s\" isn't valid: line %d is %d long and not %d.", filename, y + 2, s.Length, levelWidth));
+                                    }
+                                }
+
+                                return new Level(levelWidth, levelHeight, levelMatrix);
+                            }
+                            else
+                            {
+                                throw new ArgumentException(String.Format("File \"%s\" isn't valid: not enough lines.", filename));
+                            }
                         }
                         else
                         {
-                            throw new ArgumentException(String.Format("File \"%s\" isn't valid.", filename));
+                            throw new ArgumentException(String.Format("File \"%s\" isn't valid: no header.", filename));
                         }
                     }
                     else
@@ -168,9 +286,9 @@ namespace MyPacman
                         throw new ArgumentException(String.Format("File \"%s\" is empty.", filename));
                     }
                 }
-                catch(IOException e)
+                catch(Exception e)
                 {
-                
+                    throw e;
                 }
             }
             else
@@ -200,9 +318,10 @@ namespace MyPacman
             this.doorTexture = contentManager.Load<Texture2D>(@"images\door");
 
             // TODO: Load a pellet image
+            this.pelletTexture = contentManager.Load<Texture2D>(@"images\pellet");
 
             // TODO: Load an energizer image
-
+            this.energizerTexture = contentManager.Load<Texture2D>(@"images\energizer");
         }
 
         /// <summary>
@@ -235,14 +354,6 @@ namespace MyPacman
         /// </summary>
         /// <param name="spriteBatch">Reference to the sprite batch.</param>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        /// 
-        /// Draws the level using the matrix and the following formulas :
-        /// 
-        ///  * `realX = matrixX * Game.BLOCK_WIDTH`
-        ///  * `realY = matrixY * Game.BLOCK_HEIGHT + topBarShift`
-        ///  
-        /// Some types of blocks do not need to appear on the window, for example,
-        /// startings points 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             for(uint y = 0; y < this.height; y++)
@@ -253,36 +364,28 @@ namespace MyPacman
                     {
                         case BlockTypes.WALL:
                             // Draw the wall
-                            spriteBatch.Draw(this.wallTexture, new Vector2(this.calculateRealX(x), this.calculateRealY(y)), Color.White);
+                            spriteBatch.Draw(this.wallTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.DOOR:
                             // Draw the door
-                            spriteBatch.Draw(this.doorTexture, new Vector2(this.calculateRealX(x), this.calculateRealY(y)), Color.White);
+                            spriteBatch.Draw(this.doorTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.PELLET:
                             // Draw the pellet
+                            spriteBatch.Draw(this.pelletTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.ENERGIZER:
                             // Draw the energizer
+                            spriteBatch.Draw(this.energizerTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
                         break;
 
                         // Everything else doesn't need to appear on the window
                     }
                 }
             }
-        }
-
-        protected float calculateRealX(float x)
-        {
-            return x * Game.BLOCK_WIDTH;
-        }
-
-        protected float calculateRealY(float y)
-        {
-            return y * Game.BLOCK_HEIGHT;
         }
     }
 }
