@@ -13,7 +13,7 @@ namespace MyPacman
     public abstract class Ghost : Sprite
     {
         /// <summary>
-        /// 
+        /// Initializes a ghost.
         /// </summary>
         public override void Initialize()
         {

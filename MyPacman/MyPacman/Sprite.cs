@@ -13,7 +13,7 @@ namespace MyPacman
     public abstract class Sprite
     {
         /// <summary>
-        /// Sprite's texture, or current texture if there are several.
+        /// Holds the sprite's texture, or current texture if there are several.
         /// </summary>
         protected Texture2D texture;
 

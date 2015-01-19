@@ -37,7 +37,7 @@ namespace MyPacman
             /// </summary>
             WALL,
             /// <summary>
-            /// Represents a pellet Pacman has to eat;
+            /// Represents a pellet Pacman has to eat.
             /// </summary>
             PELLET,
             /// <summary>
@@ -62,22 +62,22 @@ namespace MyPacman
         protected BlockTypes[,] levelMatrix;
 
         /// <summary>
-        /// 
+        /// Holds a texture for a wall.
         /// </summary>
         protected Texture2D wallTexture;
 
         /// <summary>
-        /// 
+        /// Holds a texture for a door.
         /// </summary>
         protected Texture2D doorTexture;
 
         /// <summary>
-        /// 
+        /// Holds a texture for a pellet.
         /// </summary>
         protected Texture2D pelletTexture;
 
         /// <summary>
-        /// 
+        /// Holds a texture for an energizer.
         /// </summary>
         protected Texture2D energizerTexture;
 
@@ -132,6 +132,10 @@ namespace MyPacman
             this.levelMatrix = levelMatrix;
         }
 
+        /// <summary>
+        /// Loads a level from a file.
+        /// </summary>
+        /// <param name="filename">Path of the file to load.</param>
         public static Level Load(String filename)
         {
             if(File.Exists(filename))
@@ -176,7 +180,7 @@ namespace MyPacman
         }
 
         /// <summary>
-        /// 
+        /// Initializes a level.
         /// </summary>
         public override void Initialize()
         {
@@ -184,9 +188,9 @@ namespace MyPacman
         }
 
         /// <summary>
-        /// 
+        /// Loads graphic contents for a level.
         /// </summary>
-        /// <param name="contentManager"></param>
+        /// <param name="contentManager">Reference to the content manager.</param>
         public override void LoadContent(ContentManager contentManager)
         {
             // Load a wall image
@@ -210,12 +214,12 @@ namespace MyPacman
         }
 
         /// <summary>
-        /// 
+        /// Levels do not update themselves.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Levels do not update themselves.");
         }
 
         /// <summary>

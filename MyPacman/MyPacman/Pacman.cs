@@ -13,7 +13,7 @@ namespace MyPacman
     public class Pacman : Sprite
     {
         /// <summary>
-        /// 
+        /// Initializes pacman.
         /// </summary>
         public override void Initialize()
         {
@@ -21,16 +21,16 @@ namespace MyPacman
         }
 
         /// <summary>
-        /// 
+        /// Loads graphic contents for pacman.
         /// </summary>
-        /// <param name="contentManager"></param>
+        /// <param name="contentManager">Reference to the content manager.</param>
         public override void LoadContent(ContentManager contentManager)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Pacman doesn't need to unload non-graphic content.
+        /// Pacman doesn't need to unload any non-graphic content.
         /// </summary>
         public override void UnloadContent()
         {
