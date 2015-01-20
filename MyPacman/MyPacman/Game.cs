@@ -32,40 +32,40 @@ namespace MyPacman
 
         protected Texture2D uiTopTexture;
 
-        protected bool isPaused;
-
         protected uint currentScore;
 
         protected uint currentLevel;
 
         protected byte remainingLives;
 
-        // DEBUG
-        protected Level debugLevel;
-        // DEBUG
+        protected Maze currentMaze;
+
+        protected Pacman pacman;
+
+        protected Ghost[] ghosts;
 
         public Game()
         {
             this.graphics = new GraphicsDeviceManager(this);
-            this.graphics.PreferredBackBufferHeight = 640;
+            this.graphics.PreferredBackBufferHeight = 560;
             Content.RootDirectory = "Content";
 
             // Initialize game vars
-            this.isPaused = true;
             this.currentScore = 0;
             this.currentLevel = 1;
             this.remainingLives = 3;
-
-            // DEBUG
-            try
-            {
-                this.debugLevel = Level.Load(@"C:\Users\PtitBlond\Desktop\mypacman-level.lvl");
-            }
-            catch(Exception e)
-            {
-                File.WriteAllText(@"C:\Users\PtitBlond\Desktop\temp.log", String.Format("Failed to load the level: {0}.", e.Message));
-            }
-            // DEBUG
+            this.currentMaze = Maze.Load(@"C:\Users\PtitBlond\Desktop\google-level.lvl");
+            this.pacman = new Pacman();
+            this.pacman.Speed = 0.1f;
+            this.ghosts = new Ghost[4];
+            this.ghosts[0] = new Blinky();
+            this.ghosts[0].Position = Vector2.One * 25;
+            this.ghosts[1] = new Clyde();
+            this.ghosts[1].Position = Vector2.One * 50;
+            this.ghosts[2] = new Inky();
+            this.ghosts[2].Position = Vector2.One * 75;
+            this.ghosts[3] = new Pinky();
+            this.ghosts[3].Position = Vector2.One * 100;
         }
 
         /// <summary>
@@ -79,6 +79,9 @@ namespace MyPacman
             // TODO: Add your initialization logic here
             this.IsMouseVisible = true;
             
+            // TODO: Initialize Pacman's position
+            // TODO: Initialize ghosts' position
+
             base.Initialize();
         }
 
@@ -94,11 +97,16 @@ namespace MyPacman
             // TODO: use this.Content to load your game content here
             this.topBarFont = this.Content.Load<SpriteFont>(@"fonts\topBar");
             this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
-            // TODO: load ghosts content
             // TODO: load pacman content
+            this.pacman.LoadContent(Content);
+            // TODO: load ghosts content
+            for(uint i = 0; i < 4; i++)
+            {
+                this.ghosts[i].LoadContent(Content);
+            }
 
             // DEBUG
-            this.debugLevel.LoadContent(this.Content);
+            this.currentMaze.LoadContent(this.Content);
         }
 
         /// <summary>
@@ -108,8 +116,8 @@ namespace MyPacman
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
-            // TODO: unload ghosts content
             // TODO: unload pacman content
+            // TODO: unload ghosts content
         }
 
         /// <summary>
@@ -126,12 +134,15 @@ namespace MyPacman
                 this.Exit();
 
             // TODO: Add your update logic here
-            if(!this.isPaused)
+            // TODO: call Pacman.HandleKeyboard(keyboardState)
+            // TODO: call Pacman.Update()
+            this.pacman.HandleKeyboard(keyboardState);
+            this.pacman.Update(gameTime);
+
+            // TODO: call every Ghost.Update()
+            for(uint i = 0; i < 4; i++)
             {
-                // TODO: call every Ghost.HandleKeyboard(keyboardState)
-                // TODO: call every Ghost.Update()
-                // TODO: call Pacman.HandleKeyboard(keyboardState)
-                // TODO: call Pacman.Update()
+                //this.ghosts[i].Update(gameTime);
             }
 
             base.Update(gameTime);
@@ -155,16 +166,19 @@ namespace MyPacman
             this.spriteBatch.Draw(this.uiTopTexture, Vector2.Zero, Color.White);
             this.spriteBatch.DrawString(this.topBarFont, this.currentScore.ToString(), new Vector2(30, 2 + (35 - scoreDimensions.Y) / 2), Color.Gold);
             this.spriteBatch.DrawString(this.topBarFont, this.currentLevel.ToString(), new Vector2(772 - levelDimensions.X, 2 + (35 - levelDimensions.Y) / 2), Color.Gold);
-            this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(377 + (39 - livesDimensions.X) / 2, 23 + (39 - livesDimensions.Y) / 2), Color.Gold);
+            this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(379 + (39 - livesDimensions.X) / 2, 25 + (39 - livesDimensions.Y) / 2), Color.Gold);
 
             // Draw the maze
-            // DEBUG
-            this.debugLevel.Draw(gameTime, this.spriteBatch);
-            // DEBUG
+            this.currentMaze.Draw(gameTime, this.spriteBatch);
 
             // Draw the ghosts
+            for(uint i = 0; i < 4; i++)
+            {
+                this.ghosts[i].Draw(gameTime, this.spriteBatch);
+            }
 
             // Draw Pacman
+            this.pacman.Draw(gameTime, this.spriteBatch);
 
             this.spriteBatch.End();
             base.Draw(gameTime);

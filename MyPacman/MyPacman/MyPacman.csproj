@@ -76,7 +76,7 @@
     <Compile Include="Clyde.cs" />
     <Compile Include="Ghost.cs" />
     <Compile Include="Inky.cs" />
-    <Compile Include="Level.cs" />
+    <Compile Include="Maze.cs" />
     <Compile Include="Pacman.cs" />
     <Compile Include="Pinky.cs" />
     <Compile Include="MeasureUtility.cs" />

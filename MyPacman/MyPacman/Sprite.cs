@@ -140,6 +140,12 @@ namespace MyPacman
         /// </summary>
         /// <param name="spriteBatch">Reference to the sprite batch.</param>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            if (this.texture != null)
+            {
+                spriteBatch.Draw(this.texture, this.position, Color.White);
+            }
+        }
     }
 }

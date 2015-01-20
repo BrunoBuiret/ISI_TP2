@@ -26,7 +26,7 @@ namespace MyPacman
         /// <param name="contentManager">Reference to the content manager.</param>
         public override void LoadContent(ContentManager contentManager)
         {
-            throw new NotImplementedException();
+            this.texture = contentManager.Load<Texture2D>(@"images\pacman");
         }
 
         /// <summary>
@@ -43,7 +43,10 @@ namespace MyPacman
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            throw new NotImplementedException();
+            if(this.direction != Vector2.Zero)
+            {
+                this.position += this.direction * this.speed * (float) gameTime.ElapsedGameTime.TotalMilliseconds;
+            }
         }
 
         /// <summary>
@@ -52,17 +55,26 @@ namespace MyPacman
         /// <param name="state"></param>
         public override void HandleKeyboard(KeyboardState state)
         {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="spriteBatch">Reference to the sprite batch.</param>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            throw new NotImplementedException();
+            if(state.IsKeyDown(Keys.Left))
+            {
+                this.direction = new Vector2(-1, 0);//
+            }
+            else if (state.IsKeyDown(Keys.Up))
+            {
+                this.direction = new Vector2(0, -1);//
+            }
+            else if (state.IsKeyDown(Keys.Right))
+            {
+                this.direction = new Vector2(1, 0);//
+            }
+            else if (state.IsKeyDown(Keys.Down))
+            {
+                this.direction = new Vector2(0, 1);//
+            }
+            else
+            {
+                this.direction = Vector2.Zero;
+            }
         }
     }
 }

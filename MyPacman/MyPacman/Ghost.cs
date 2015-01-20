@@ -46,19 +46,5 @@ namespace MyPacman
         {
             throw new NotSupportedException("Ghosts do not react to user input.");
         }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="spriteBatch">Reference to the sprite batch.</param>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            if(this.texture != null)
-            {
-                spriteBatch.Draw(this.texture, this.position, Color.White);
-            }
-        }
     }
 }
