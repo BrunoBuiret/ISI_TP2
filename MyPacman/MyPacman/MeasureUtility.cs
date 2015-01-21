@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Microsoft.Xna.Framework;
+
 namespace MyPacman
 {
     public static class MeasureUtility
@@ -35,6 +37,18 @@ namespace MyPacman
         public static float blockYToActualY(float y)
         {
             return 100 + y * MeasureUtility.BLOCK_HEIGHT;
+        }
+
+        /// <summary>
+        /// Converts a Vector2 with block coordinates to a Vector2 with actual coordinates.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 blockVector2ToActualVector2(Vector2 v)
+        {
+            v.X = MeasureUtility.blockXToActualX(v.X);
+            v.Y = MeasureUtility.blockYToActualY(v.Y);
+            return v;
         }
     }
 }

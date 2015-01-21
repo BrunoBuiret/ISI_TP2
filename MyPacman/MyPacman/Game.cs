@@ -19,6 +19,41 @@ namespace MyPacman
     public class Game : Microsoft.Xna.Framework.Game
     {
         /// <summary>
+        /// Describes every state of the game.
+        /// </summary>
+        public enum GameState : byte
+        {
+            /// <summary>
+            /// User is currently in the main menu.
+            /// </summary>
+            MENU,
+            /// <summary>
+            /// User is currently reading help.
+            /// </summary>
+            HELP,
+            /// <summary>
+            /// User is currently playing.
+            /// </summary>
+            PLAYING,
+            /// <summary>
+            /// User paused the game.
+            /// </summary>
+            PAUSED,
+            /// <summary>
+            /// User is looking at his score.
+            /// </summary>
+            SCORE
+        };
+
+        public enum GhostsIndex : byte
+        {
+            BLINKY = 0,
+            CLYDE = 1,
+            INKY = 2,
+            PINKY = 3
+        }
+
+        /// <summary>
         /// Holds a reference to the graphics device manager.
         /// </summary>
         protected GraphicsDeviceManager graphics;
@@ -28,15 +63,39 @@ namespace MyPacman
         /// </summary>
         protected SpriteBatch spriteBatch;
 
-        protected SpriteFont topBarFont;
+        //==================================================
+
+        protected SpriteFont uiFont;
+
+        protected Texture2D uiMenuSoundsOnTexture;
+
+        protected Texture2D uiMenuSoundsOffTexture;
+
+        protected Texture2D uiHelpTexture;
+
+        protected Texture2D uiPauseTexture;
 
         protected Texture2D uiTopTexture;
 
-        protected uint currentScore;
+        protected Texture2D uiLifeTexture;
 
-        protected uint currentLevel;
+        protected Texture2D uiScoreTexture;
 
-        protected byte remainingLives;
+        protected Vector2[] livesPositions;
+
+        //==================================================
+
+        protected GameState currentState;
+
+        protected Boolean soundsActivated;
+
+        //==================================================
+
+        protected Byte remainingLives;
+
+        protected UInt32 currentScore;
+
+        protected Byte currentLevel;
 
         protected Maze currentMaze;
 
@@ -44,43 +103,47 @@ namespace MyPacman
 
         protected Ghost[] ghosts;
 
+        #region DEBUG
+        protected KeyboardState previousKeyboardState;
+        #endregion
+
+        /// <summary>
+        /// Creates a new game.
+        /// </summary>
         public Game()
         {
             this.graphics = new GraphicsDeviceManager(this);
-            this.graphics.PreferredBackBufferHeight = 560;
-            Content.RootDirectory = "Content";
-
-            // Initialize game vars
-            this.currentScore = 0;
-            this.currentLevel = 1;
-            this.remainingLives = 3;
-            this.currentMaze = Maze.Load(@"C:\Users\PtitBlond\Desktop\google-level.lvl");
-            this.pacman = new Pacman();
-            this.pacman.Speed = 0.1f;
-            this.ghosts = new Ghost[4];
-            this.ghosts[0] = new Blinky();
-            this.ghosts[0].Position = Vector2.One * 25;
-            this.ghosts[1] = new Clyde();
-            this.ghosts[1].Position = Vector2.One * 50;
-            this.ghosts[2] = new Inky();
-            this.ghosts[2].Position = Vector2.One * 75;
-            this.ghosts[3] = new Pinky();
-            this.ghosts[3].Position = Vector2.One * 100;
+            this.graphics.PreferredBackBufferHeight = 600;
+            this.Content.RootDirectory = "Content";
         }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
-        /// related content. Calling base.Initialize will enumerate through any components
+        /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            this.IsMouseVisible = true;
-            
-            // TODO: Initialize Pacman's position
-            // TODO: Initialize ghosts' position
+            this.currentState = GameState.MENU;
+            this.soundsActivated = true;
+            this.livesPositions = new Vector2[8];
+            this.livesPositions[0] = new Vector2(392, 4);
+            this.livesPositions[1] = new Vector2(364, 14);
+            this.livesPositions[2] = new Vector2(418, 13);
+            this.livesPositions[3] = new Vector2(355, 41);
+            this.livesPositions[4] = new Vector2(428, 40);
+            this.livesPositions[5] = new Vector2(363, 63);
+            this.livesPositions[6] = new Vector2(418, 63);
+            this.livesPositions[7] = new Vector2(392, 73);
+            this.currentMaze = Maze.Load(@"C:\Users\PtitBlond\Desktop\mypacman-level.lvl");
+            this.pacman = new Pacman();
+            this.ghosts = new Ghost[4];
+            this.ghosts[0] = new Blinky();
+            this.ghosts[1] = new Clyde();
+            this.ghosts[2] = new Inky();
+            this.ghosts[3] = new Pinky();
 
             base.Initialize();
         }
@@ -92,21 +155,25 @@ namespace MyPacman
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            this.spriteBatch = new SpriteBatch(GraphicsDevice);
+            this.spriteBatch = new SpriteBatch(this.GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            this.topBarFont = this.Content.Load<SpriteFont>(@"fonts\topBar");
+            this.uiFont = this.Content.Load<SpriteFont>(@"fonts\ui-font");
+            this.uiMenuSoundsOnTexture = this.Content.Load<Texture2D>(@"images\ui-menu-sounds-on");
+            this.uiMenuSoundsOffTexture = this.Content.Load<Texture2D>(@"images\ui-menu-sounds-off");
+            this.uiHelpTexture = this.Content.Load<Texture2D>(@"images\ui-help");
+            this.uiPauseTexture = this.Content.Load<Texture2D>(@"images\ui-pause");
             this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
-            // TODO: load pacman content
-            this.pacman.LoadContent(Content);
-            // TODO: load ghosts content
+            this.uiLifeTexture = this.Content.Load<Texture2D>(@"images\ui-life");
+            this.uiScoreTexture = this.Content.Load<Texture2D>(@"images\ui-score");
+
+            this.currentMaze.LoadContent(this.Content);
+            this.pacman.LoadContent(this.Content);
+            
             for(uint i = 0; i < 4; i++)
             {
-                this.ghosts[i].LoadContent(Content);
+                this.ghosts[i].LoadContent(this.Content);
             }
-
-            // DEBUG
-            this.currentMaze.LoadContent(this.Content);
         }
 
         /// <summary>
@@ -116,8 +183,6 @@ namespace MyPacman
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
-            // TODO: unload pacman content
-            // TODO: unload ghosts content
         }
 
         /// <summary>
@@ -125,25 +190,148 @@ namespace MyPacman
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <see cref="https://msdn.microsoft.com/en-us/library/bb203906.aspx"/>
+        /// <see cref="https://msdn.microsoft.com/en-us/library/microsoft.xna.framework.boundingsphere.intersects.aspx"/>
+        /// <see cref="https://msdn.microsoft.com/en-us/library/microsoft.xna.framework.boundingbox.intersects.aspx"/>
         protected override void Update(GameTime gameTime)
         {
+            // TODO: Add your update logic here
             KeyboardState keyboardState = Keyboard.GetState();
 
-            // Allows the game to exit
-            if (keyboardState.IsKeyDown(Keys.Escape))
-                this.Exit();
-
-            // TODO: Add your update logic here
-            // TODO: call Pacman.HandleKeyboard(keyboardState)
-            // TODO: call Pacman.Update()
-            this.pacman.HandleKeyboard(keyboardState);
-            this.pacman.Update(gameTime);
-
-            // TODO: call every Ghost.Update()
-            for(uint i = 0; i < 4; i++)
+            switch(this.currentState)
             {
-                //this.ghosts[i].Update(gameTime);
+                case GameState.PLAYING:
+                    if(keyboardState.IsKeyDown(Keys.Escape))
+                    {
+                        // User pressed Escape
+                        // Pause the game and open the menu
+                        this.currentState = GameState.PAUSED;
+                    }
+                    else
+                    {
+                        // Update the game
+                        this.pacman.HandleKeyboard(keyboardState);
+                        this.pacman.Update(gameTime);
+
+                        if (this.remainingLives == 0)
+                        {
+                            this.currentState = GameState.SCORE;
+                        }
+
+                        #region DEBUG_UI
+                        if(keyboardState.IsKeyDown(Keys.Add))
+                        {
+                            this.currentScore += 100000;
+                        }
+                        else if(keyboardState.IsKeyDown(Keys.Subtract))
+                        {
+                            this.currentScore -= 100000;
+                        }
+                        else if (keyboardState.IsKeyDown(Keys.Multiply) && this.remainingLives < 8 && this.previousKeyboardState.IsKeyUp(Keys.Multiply))
+                        {
+                            this.remainingLives++;
+                        }
+                        else if(keyboardState.IsKeyDown(Keys.Divide) && this.remainingLives > 0 && this.previousKeyboardState.IsKeyUp(Keys.Divide))
+                        {
+                            this.remainingLives--;
+                        }
+                        else if(keyboardState.IsKeyDown(Keys.Back) && this.currentLevel > 0)
+                        {
+                            this.currentLevel--;
+                        }
+                        else if(keyboardState.IsKeyDown(Keys.Insert) && this.currentLevel < 255)
+                        {
+                            this.currentLevel++;
+                        }
+                        #endregion
+                    }
+                break;
+
+                case GameState.PAUSED:
+                    if(keyboardState.IsKeyDown(Keys.R))
+                    {
+                        // User pressed R
+                        // Resume the game
+                        this.currentState = GameState.PLAYING;
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.E))
+                    {
+                        // User pressed M
+                        // Go back to the main menu
+                        this.currentState = GameState.MENU;
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.Q))
+                    {
+                        // User pressed Q
+                        // Quit the software
+                        this.Exit();
+                    }
+                break;
+
+                case GameState.HELP:
+                    if(keyboardState.IsKeyDown(Keys.C))
+                    {
+                        // User pressed C
+                        // Return to the menu
+                        this.currentState = GameState.MENU;
+                    }
+                break;
+
+                case GameState.SCORE:
+                    if(keyboardState.IsKeyDown(Keys.C))
+                    {
+                        // User pressed C
+                        // Return to the menu
+                        this.currentState = GameState.MENU;
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.Q))
+                    {
+                        // User pressed Q
+                        // Quit the software
+                        this.Exit();
+                    }
+                break;
+
+                case GameState.MENU:
+                    if(keyboardState.IsKeyDown(Keys.N))
+                    {
+                        // User pressed N
+                        // Create a new game
+                        this.currentState = GameState.PLAYING;
+                        this.currentScore = 0;
+                        this.remainingLives = 3;
+                        this.currentLevel = 1;
+                        this.pacman.Position = MeasureUtility.blockVector2ToActualVector2(currentMaze.GetPacmanStartPosition());
+                        this.pacman.Speed = 0.1f;
+
+                        foreach(byte index in Enum.GetValues(typeof(GhostsIndex)))
+                        {
+                            this.ghosts[index].Position = MeasureUtility.blockVector2ToActualVector2(this.currentMaze.GetGhostStartPosition((GhostsIndex) index));
+                            this.ghosts[index].Speed = 0.1f;
+                        }
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.H))
+                    {
+                        // User pressed H
+                        // Display help
+                        this.currentState = GameState.HELP;
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.S) && this.previousKeyboardState.IsKeyUp(Keys.S))
+                    {
+                        // User pressed S
+                        // (De)activate sounds
+                        this.soundsActivated = !this.soundsActivated;
+                    }
+                    else if(keyboardState.IsKeyDown(Keys.Q))
+                    {
+                        // User pressed Q
+                        // Quit the software
+                        this.Exit();
+                    }
+                break;
             }
+
+            this.previousKeyboardState = keyboardState;
 
             base.Update(gameTime);
         }
@@ -157,30 +345,156 @@ namespace MyPacman
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
+            Vector2 textDimensions;
+            Color goldColor = new Color(255, 204, 0);
+
             this.spriteBatch.Begin();
 
-            // Draw the UI
-            Vector2 scoreDimensions = this.topBarFont.MeasureString(this.currentScore.ToString());
-            Vector2 levelDimensions = this.topBarFont.MeasureString(this.currentLevel.ToString());
-            Vector2 livesDimensions = this.topBarFont.MeasureString(this.remainingLives.ToString());
-            this.spriteBatch.Draw(this.uiTopTexture, Vector2.Zero, Color.White);
-            this.spriteBatch.DrawString(this.topBarFont, this.currentScore.ToString(), new Vector2(30, 2 + (35 - scoreDimensions.Y) / 2), Color.Gold);
-            this.spriteBatch.DrawString(this.topBarFont, this.currentLevel.ToString(), new Vector2(772 - levelDimensions.X, 2 + (35 - levelDimensions.Y) / 2), Color.Gold);
-            this.spriteBatch.DrawString(this.topBarFont, this.remainingLives.ToString(), new Vector2(379 + (39 - livesDimensions.X) / 2, 25 + (39 - livesDimensions.Y) / 2), Color.Gold);
-
-            // Draw the maze
-            this.currentMaze.Draw(gameTime, this.spriteBatch);
-
-            // Draw the ghosts
-            for(uint i = 0; i < 4; i++)
+            switch(this.currentState)
             {
-                this.ghosts[i].Draw(gameTime, this.spriteBatch);
+                case GameState.PLAYING:
+                    // Draw the UI
+                    this.spriteBatch.Draw(this.uiTopTexture, Vector2.Zero, Color.White);
+
+                    textDimensions = this.uiFont.MeasureString(this.currentScore.ToString());
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        this.currentScore.ToString(),
+                        new Vector2(30, 3 + (36 - textDimensions.Y) / 2),
+                        goldColor
+                    );
+
+                    textDimensions = this.uiFont.MeasureString(this.remainingLives.ToString());
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        this.remainingLives.ToString(),
+                        new Vector2(376 + (42 - textDimensions.X) / 2, 24 + (42 - textDimensions.Y) / 2),
+                        goldColor
+                    );
+
+                    textDimensions = this.uiFont.MeasureString(this.currentLevel.ToString());
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        this.currentLevel.ToString(),
+                        new Vector2(772 - textDimensions.X, 3 + (36 - textDimensions.Y) / 2),
+                        goldColor
+                    );
+
+                    for(uint i = 0; i < this.remainingLives; i++)
+                    {
+                        this.spriteBatch.Draw(
+                            this.uiLifeTexture,
+                            this.livesPositions[i],
+                            Color.White
+                        );
+                    }
+
+                    // Draw the maze
+                    this.currentMaze.Draw(gameTime, this.spriteBatch);
+
+                    // Draw the ghosts
+                    for(uint i = 0; i < 4; i++)
+                    {
+                        this.ghosts[i].Draw(gameTime, this.spriteBatch);
+                    }
+
+                    // Draw Pacman
+                    this.pacman.Draw(gameTime, this.spriteBatch);
+                break;
+
+                case GameState.PAUSED:
+                    // Draw the UI
+                    this.spriteBatch.Draw(
+                        this.uiPauseTexture,
+                        new Vector2((this.graphics.PreferredBackBufferWidth - this.uiPauseTexture.Width) / 2, (this.graphics.PreferredBackBufferHeight - this.uiPauseTexture.Height) / 2),
+                        Color.White
+                    );
+                break;
+
+                case GameState.HELP:
+                    // Draw the UI
+                    this.spriteBatch.Draw(
+                        this.uiHelpTexture,
+                        new Vector2((this.graphics.PreferredBackBufferWidth - this.uiHelpTexture.Width) / 2, (this.graphics.PreferredBackBufferHeight - this.uiHelpTexture.Height) / 2),
+                        Color.White
+                    );
+                break;
+
+                case GameState.SCORE:
+                    // Draw the UI
+                    int x = (this.graphics.PreferredBackBufferWidth - this.uiScoreTexture.Width) / 2;
+                    int y = (this.graphics.PreferredBackBufferHeight - this.uiScoreTexture.Height) / 2;
+
+                    this.spriteBatch.Draw(
+                        this.uiScoreTexture,
+                        new Vector2(x , y),
+                        Color.White
+                    );
+
+                    // Draw score
+                    String scoreText = String.Format("You reached level {0} with {1}.", this.currentLevel, this.currentScore);
+                    textDimensions = this.uiFont.MeasureString(scoreText);
+                    x += 40 + (int) (359 - textDimensions.X) / 2;
+                    y += 42;
+
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        "You reached level ",
+                        new Vector2(x, y + (63 - textDimensions.Y) / 2),
+                        Color.Gold
+                    );
+
+                    x += (int) this.uiFont.MeasureString("You reached level ").X;
+
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        this.currentLevel.ToString(),
+                        new Vector2(x, y + (63 - textDimensions.Y) / 2),
+                        Color.White
+                    );
+
+                    x += (int) this.uiFont.MeasureString(this.currentLevel.ToString()).X;
+
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        " with ",
+                        new Vector2(x, y + (63 - textDimensions.Y) / 2),
+                        goldColor
+                    );
+
+                    x += (int) this.uiFont.MeasureString(" with ").X;
+
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        this.currentScore.ToString(),
+                        new Vector2(x, y + (63 - textDimensions.Y) / 2),
+                        Color.White
+                    );
+
+                    x += (int) this.uiFont.MeasureString(this.currentScore.ToString()).X;
+
+                    this.spriteBatch.DrawString(
+                        this.uiFont,
+                        ".",
+                        new Vector2(x, y + (63 - textDimensions.Y) / 2),
+                        goldColor
+                    );
+                break;
+
+                case GameState.MENU:
+                    // Draw the UI
+                    Texture2D uiTexture = this.soundsActivated ? this.uiMenuSoundsOnTexture : this.uiMenuSoundsOffTexture;
+
+                    this.spriteBatch.Draw(
+                        uiTexture,
+                        new Vector2((this.graphics.PreferredBackBufferWidth - uiTexture.Width) / 2, (this.graphics.PreferredBackBufferHeight - uiTexture.Height) / 2),
+                        Color.White
+                    );
+                break;
             }
 
-            // Draw Pacman
-            this.pacman.Draw(gameTime, this.spriteBatch);
-
             this.spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

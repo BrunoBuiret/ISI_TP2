@@ -208,13 +208,17 @@ namespace MyPacman
 
         protected readonly Vector2 pacmanStartPosition;
 
-        protected readonly Vector2 blinkyStartPosition;
+        public Vector2 GetPacmanStartPosition()
+        {
+            return this.pacmanStartPosition;
+        }
 
-        protected readonly Vector2 clydeStartPosition;
+        protected readonly Vector2[] ghostsStartPosition;
 
-        protected readonly Vector2 inkyStartPosition;
-
-        protected readonly Vector2 pinkyStartPosition;
+        public Vector2 GetGhostStartPosition(Game.GhostsIndex index)
+        {
+            return this.ghostsStartPosition[(int) index];
+        }
 
         /// <summary>
         /// Holds a texture for a wall.
@@ -260,7 +264,8 @@ namespace MyPacman
 
             // Go through the matrix to check and parse it
             this.pelletsNumber = 0;
-            this.pacmanStartPosition = this.blinkyStartPosition = this.clydeStartPosition = this.inkyStartPosition = this.pinkyStartPosition = new Vector2(-1, -1);
+            this.ghostsStartPosition = new Vector2[4];
+            this.pacmanStartPosition = this.ghostsStartPosition[0] = this.ghostsStartPosition[1] = this.ghostsStartPosition[2] = this.ghostsStartPosition[3] = new Vector2(-1, -1);
 
             for(uint x = 0; x < width; x++)
             {
@@ -284,56 +289,73 @@ namespace MyPacman
                         break;
 
                         case BlockTypes.BLINKY_START:
-                            if (this.blinkyStartPosition.X == -1 && this.blinkyStartPosition.Y == -1)
+                            if (this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].Y == -1)
                             {
-                                this.blinkyStartPosition = new Vector2(x, y);
+                                this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY] = new Vector2(x, y);
                             }
                             else
                             {
-                                throw new ArgumentException(String.Format("Blinky's start position was already set at {0},{1}.", this.blinkyStartPosition.X, this.blinkyStartPosition.Y));
+                                throw new ArgumentException(String.Format("Blinky's start position was already set at {0},{1}.", this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].X, this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].Y));
                             }
                         break;
 
                         case BlockTypes.CLYDE_START:
-                            if (this.clydeStartPosition.X == -1 && this.clydeStartPosition.Y == -1)
+                            if (this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].Y == -1)
                             {
-                                this.clydeStartPosition = new Vector2(x, y);
+                                this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE] = new Vector2(x, y);
                             }
                             else
                             {
-                                throw new ArgumentException(String.Format("Clyde's start position was already set at {0},{1}.", this.clydeStartPosition.X, this.clydeStartPosition.Y));
+                                throw new ArgumentException(String.Format("Clyde's start position was already set at {0},{1}.", this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].X, this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].Y));
                             }
                         break;
 
                         case BlockTypes.INKY_START:
-                            if (this.inkyStartPosition.X == -1 && this.inkyStartPosition.Y == -1)
+                            if (this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].Y == -1)
                             {
-                                this.inkyStartPosition = new Vector2(x, y);
+                                this.ghostsStartPosition[(int) Game.GhostsIndex.INKY] = new Vector2(x, y);
                             }
                             else
                             {
-                                throw new ArgumentException(String.Format("Inky's start position was already set at {0},{1}.", this.inkyStartPosition.X, this.inkyStartPosition.Y));
+                                throw new ArgumentException(String.Format("Inky's start position was already set at {0},{1}.", this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].X, this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].Y));
                             }
                         break;
 
                         case BlockTypes.PINKY_START:
-                            if (this.pinkyStartPosition.X == -1 && this.pinkyStartPosition.Y == -1)
+                            if (this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].Y == -1)
                             {
-                                this.pinkyStartPosition = new Vector2(x, y);
+                                this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY] = new Vector2(x, y);
                             }
                             else
                             {
-                                throw new ArgumentException(String.Format("Pinky's start position was already set at {0},{1}.", this.pinkyStartPosition.X, this.pinkyStartPosition.Y));
+                                throw new ArgumentException(String.Format("Blinky's start position was already set at {0},{1}.", this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].X, this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].Y));
                             }
                         break;
                     }
                 }
             }
 
-            // Parse the matrix to ensure width, height
-            // Parse the matrix to find the numbers of pellets
-            // Parse the matrix to find the starting points of pacman and the ghosts
-            // Then, save it
+            if(this.pacmanStartPosition.X == -1 && this.pacmanStartPosition.Y == -1)
+            {
+                throw new ArgumentException("Pacman doesn't have a start point.");
+            }
+            else if (this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.BLINKY].Y == -1)
+            {
+                throw new ArgumentException("Blinky doesn't have a start point.");
+            }
+            else if (this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.CLYDE].Y == -1)
+            {
+                throw new ArgumentException("Clyde doesn't have a start point.");
+            }
+            else if (this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.INKY].Y == -1)
+            {
+                throw new ArgumentException("Inky doesn't have a start point.");
+            }
+            else if (this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].X == -1 && this.ghostsStartPosition[(int) Game.GhostsIndex.PINKY].Y == -1)
+            {
+                throw new ArgumentException("Pinky doesn't have a start point.");
+            }
+
             this.width = width;
             this.height = height;
             this.levelMatrix = levelMatrix;
