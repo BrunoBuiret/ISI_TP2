@@ -89,6 +89,8 @@ namespace MyPacman
 
         protected Boolean soundsActivated;
 
+        protected KeyboardState previousKeyboardState;
+
         //==================================================
 
         protected Byte remainingLives;
@@ -102,10 +104,6 @@ namespace MyPacman
         protected Pacman pacman;
 
         protected Ghost[] ghosts;
-
-        #region DEBUG
-        protected KeyboardState previousKeyboardState;
-        #endregion
 
         /// <summary>
         /// Creates a new game.
@@ -140,10 +138,10 @@ namespace MyPacman
             this.currentMaze = Maze.Load(this.Content.RootDirectory + @"\data\simple-level.lvl");
             this.pacman = new Pacman();
             this.ghosts = new Ghost[4];
-            this.ghosts[0] = new Blinky();
-            this.ghosts[1] = new Clyde();
-            this.ghosts[2] = new Inky();
-            this.ghosts[3] = new Pinky();
+            this.ghosts[(int) GhostsIndex.BLINKY] = new Blinky();
+            this.ghosts[(int) GhostsIndex.CLYDE] = new Clyde();
+            this.ghosts[(int) GhostsIndex.INKY] = new Inky();
+            this.ghosts[(int) GhostsIndex.PINKY] = new Pinky();
 
             base.Initialize();
         }
@@ -170,9 +168,9 @@ namespace MyPacman
             this.currentMaze.LoadContent(this.Content);
             this.pacman.LoadContent(this.Content);
             
-            for(uint i = 0; i < 4; i++)
+            foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
             {
-                this.ghosts[i].LoadContent(this.Content);
+                this.ghosts[index].LoadContent(this.Content);
             }
         }
 
@@ -211,6 +209,9 @@ namespace MyPacman
                     {
                         // Update the game
                         this.pacman.HandleKeyboard(keyboardState);
+
+                        // TODO: Handle collisions by overriding pacman's direction
+
                         this.pacman.Update(gameTime);
 
                         if (this.remainingLives == 0)
@@ -393,9 +394,9 @@ namespace MyPacman
                     this.currentMaze.Draw(gameTime, this.spriteBatch);
 
                     // Draw the ghosts
-                    for(uint i = 0; i < 4; i++)
+                    foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
                     {
-                        this.ghosts[i].Draw(gameTime, this.spriteBatch);
+                        this.ghosts[index].Draw(gameTime, this.spriteBatch);
                     }
 
                     // Draw Pacman

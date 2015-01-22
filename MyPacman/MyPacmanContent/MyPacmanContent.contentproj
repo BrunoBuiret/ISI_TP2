@@ -143,10 +143,12 @@
     <None Include="data\google-level.lvl">
       <Name>google-level</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Processor>PassThroughProcessor</Processor>
     </None>
     <None Include="data\simple-level.lvl">
       <Name>simple-level</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Processor>PassThroughProcessor</Processor>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

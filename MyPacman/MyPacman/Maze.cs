@@ -568,5 +568,61 @@ namespace MyPacman
                 }
             }
         }
+
+        public dynamic GetBoundingBoxAt(uint x, uint y)
+        {
+            if(x < this.width && y < this.height)
+            {
+                switch(this.levelMatrix[x, y])
+                {
+                    case BlockTypes.DOOR:
+                        return new BoundingBox(
+                            new Vector3(
+                                MeasureUtility.blockXToActualX(x),
+                                MeasureUtility.blockYToActualY(y) + 5,
+                                0
+                            ),
+                            new Vector3(
+                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH,
+                                MeasureUtility.blockYToActualY(y) + 15,
+                                0
+                            )
+                        );
+
+                    case BlockTypes.WALL:
+                        return new BoundingBox(
+                            new Vector3(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y), 0),
+                            new Vector3(MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH, MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT, 0)
+                        );
+
+                    case BlockTypes.PELLET:
+                        return new BoundingSphere(
+                            new Vector3(
+                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH / 2,
+                                MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT / 2,
+                                0
+                            ),
+                            2
+                        );
+
+                    case BlockTypes.ENERGIZER:
+                        return new BoundingSphere(
+                            new Vector3(
+                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH / 2,
+                                MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT / 2,
+                                0
+                            ),
+                            6
+                        );
+
+                    default:
+                        return null;
+                }
+            }
+            else
+            {
+                throw new ArgumentException(String.Format("Point {0},{1} doesn't belong to this maze.", x, y));
+            }
+        }
     }
 }

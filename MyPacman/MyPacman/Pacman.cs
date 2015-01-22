@@ -76,5 +76,17 @@ namespace MyPacman
                 this.direction = Vector2.Zero;
             }
         }
+
+        public BoundingSphere GetBoundingSphere()
+        {
+            return new BoundingSphere(
+                new Vector3(
+                    this.position.X + MeasureUtility.BLOCK_WIDTH / 2,
+                    this.position.Y + MeasureUtility.BLOCK_HEIGHT / 2,
+                    0
+                ),
+                10
+            );
+        }
     }
 }
