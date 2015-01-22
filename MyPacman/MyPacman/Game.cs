@@ -137,6 +137,7 @@ namespace MyPacman
             this.livesPositions[7] = new Vector2(392, 73);
             this.currentMaze = Maze.Load(this.Content.RootDirectory + @"\data\simple-level.lvl");
             this.pacman = new Pacman();
+            this.pacman.Initialize();
             this.ghosts = new Ghost[4];
             this.ghosts[(int) GhostsIndex.BLINKY] = new Blinky();
             this.ghosts[(int) GhostsIndex.CLYDE] = new Clyde();
@@ -211,9 +212,35 @@ namespace MyPacman
                         this.pacman.HandleKeyboard(keyboardState);
 
                         // TODO: Handle collisions by overriding pacman's direction
+                        if(this.pacman.Direction.X != 0)
+                        {
+                            // Pacman is moving horizontally
+                            if(this.pacman.Direction.X > 0)
+                            {
+                                // Pacman is moving to the right
+                            }
+                            else
+                            {
+                                // Pacman is moving to the left
+                            }
+                        }
+                        else if(this.pacman.Direction.Y != 0)
+                        {
+                            // Pacman is moving vertically
+                            if(this.pacman.Direction.Y > 0)
+                            {
+                                // Pacman is going down
+                            }
+                            else
+                            {
+                                // Pacman is going up
+                            }
+                        }
 
+                        // Update Pacman's position if needed
                         this.pacman.Update(gameTime);
 
+                        // Has the user lost?
                         if (this.remainingLives == 0)
                         {
                             this.currentState = GameState.SCORE;

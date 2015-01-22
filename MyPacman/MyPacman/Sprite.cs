@@ -76,7 +76,7 @@ namespace MyPacman
 
             set
             {
-                this.direction = Vector2.Normalize(value);
+                this.direction = value != Vector2.Zero ? Vector2.Normalize(value) : value;
             }
         }
 

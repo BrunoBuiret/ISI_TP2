@@ -545,22 +545,22 @@ namespace MyPacman
                     {
                         case BlockTypes.WALL:
                             // Draw the wall
-                            spriteBatch.Draw(this.wallTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
+                            spriteBatch.Draw(this.wallTexture, new Vector2(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.DOOR:
                             // Draw the door
-                            spriteBatch.Draw(this.doorTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
+                            spriteBatch.Draw(this.doorTexture, new Vector2(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.PELLET:
                             // Draw the pellet
-                            spriteBatch.Draw(this.pelletTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
+                            spriteBatch.Draw(this.pelletTexture, new Vector2(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y)), Color.White);
                         break;
 
                         case BlockTypes.ENERGIZER:
                             // Draw the energizer
-                            spriteBatch.Draw(this.energizerTexture, new Vector2(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y)), Color.White);
+                            spriteBatch.Draw(this.energizerTexture, new Vector2(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y)), Color.White);
                         break;
 
                         // Everything else doesn't need to appear on the window
@@ -569,7 +569,7 @@ namespace MyPacman
             }
         }
 
-        public dynamic GetBoundingBoxAt(uint x, uint y)
+        public BoundingBox GetBoundingBoxAt(uint x, uint y)
         {
             if(x < this.width && y < this.height)
             {
@@ -578,45 +578,37 @@ namespace MyPacman
                     case BlockTypes.DOOR:
                         return new BoundingBox(
                             new Vector3(
-                                MeasureUtility.blockXToActualX(x),
-                                MeasureUtility.blockYToActualY(y) + 5,
+                                MeasureUtility.BlockXToActualX(x),
+                                MeasureUtility.BlockYToActualY(y) + 5,
                                 0
                             ),
                             new Vector3(
-                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH,
-                                MeasureUtility.blockYToActualY(y) + 15,
+                                MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH,
+                                MeasureUtility.BlockYToActualY(y) + 15,
                                 0
                             )
                         );
 
                     case BlockTypes.WALL:
                         return new BoundingBox(
-                            new Vector3(MeasureUtility.blockXToActualX(x), MeasureUtility.blockYToActualY(y), 0),
-                            new Vector3(MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH, MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT, 0)
+                            new Vector3(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y), 0),
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH, MeasureUtility.BlockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT, 0)
                         );
 
                     case BlockTypes.PELLET:
-                        return new BoundingSphere(
-                            new Vector3(
-                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH / 2,
-                                MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT / 2,
-                                0
-                            ),
-                            2
+                        return new BoundingBox(
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + 8, MeasureUtility.BlockYToActualY(y) + 8, 0),
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + 10, MeasureUtility.BlockYToActualY(y) + 10, 0)
                         );
 
                     case BlockTypes.ENERGIZER:
-                        return new BoundingSphere(
-                            new Vector3(
-                                MeasureUtility.blockXToActualX(x) + MeasureUtility.BLOCK_WIDTH / 2,
-                                MeasureUtility.blockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT / 2,
-                                0
-                            ),
-                            6
+                        return new BoundingBox(
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + 4, MeasureUtility.BlockYToActualY(y) + 4, 0),
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + 15, MeasureUtility.BlockYToActualY(y) + 15, 0)
                         );
 
                     default:
-                        return null;
+                        return new BoundingBox();
                 }
             }
             else

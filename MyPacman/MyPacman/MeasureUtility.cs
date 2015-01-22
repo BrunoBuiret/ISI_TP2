@@ -24,9 +24,19 @@ namespace MyPacman
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static float blockXToActualX(float x)
+        public static float BlockXToActualX(float x)
         {
             return x * MeasureUtility.BLOCK_WIDTH;
+        }
+
+        /// <summary>
+        /// Converts an actual abscissa to a block abscissa.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static float ActualXToBlockX(float x)
+        {
+            return x / MeasureUtility.BLOCK_WIDTH;
         }
 
         /// <summary>
@@ -34,9 +44,19 @@ namespace MyPacman
         /// </summary>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static float blockYToActualY(float y)
+        public static float BlockYToActualY(float y)
         {
             return 100 + y * MeasureUtility.BLOCK_HEIGHT;
+        }
+
+        /// <summary>
+        /// Converts an actual ordinate to a block ordinate.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static float ActualYToBlockY(float y)
+        {
+            return (y - 100) / MeasureUtility.BLOCK_HEIGHT;
         }
 
         /// <summary>
@@ -46,8 +66,8 @@ namespace MyPacman
         /// <returns></returns>
         public static Vector2 blockVector2ToActualVector2(Vector2 v)
         {
-            v.X = MeasureUtility.blockXToActualX(v.X);
-            v.Y = MeasureUtility.blockYToActualY(v.Y);
+            v.X = MeasureUtility.BlockXToActualX(v.X);
+            v.Y = MeasureUtility.BlockYToActualY(v.Y);
             return v;
         }
     }
