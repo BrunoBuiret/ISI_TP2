@@ -137,7 +137,7 @@ namespace MyPacman
             this.livesPositions[5] = new Vector2(363, 63);
             this.livesPositions[6] = new Vector2(418, 63);
             this.livesPositions[7] = new Vector2(392, 73);
-            this.currentMaze = Maze.Load(@"C:\Users\PtitBlond\Desktop\mypacman-level.lvl");
+            this.currentMaze = Maze.Load(this.Content.RootDirectory + @"\data\simple-level.lvl");
             this.pacman = new Pacman();
             this.ghosts = new Ghost[4];
             this.ghosts[0] = new Blinky();
