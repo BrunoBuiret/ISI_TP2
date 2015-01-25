@@ -89,6 +89,8 @@ namespace MyPacman
 
         protected Boolean soundsActivated;
 
+        protected List<Song> songsList;
+
         protected KeyboardState previousKeyboardState;
 
         //==================================================
@@ -125,7 +127,8 @@ namespace MyPacman
         {
             // TODO: Add your initialization logic here
             this.currentState = GameState.MENU;
-            this.soundsActivated = true;
+            this.soundsActivated = false;
+            this.songsList = new List<Song>();
             this.livesPositions = new Vector2[8];
             this.livesPositions[0] = new Vector2(392, 4);
             this.livesPositions[1] = new Vector2(364, 14);
@@ -165,6 +168,19 @@ namespace MyPacman
             this.uiTopTexture = this.Content.Load<Texture2D>(@"images\ui-top");
             this.uiLifeTexture = this.Content.Load<Texture2D>(@"images\ui-life");
             this.uiScoreTexture = this.Content.Load<Texture2D>(@"images\ui-score");
+
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\human-1"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\human-2"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\human-3"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\orc-1"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\orc-2"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\orc-3"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\undead-1"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\undead-2"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\undead-3"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\night-elf-1"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\night-elf-2"));
+            this.songsList.Add(this.Content.Load<Song>(@"sounds\night-elf-3"));
 
             this.currentMaze.LoadContent(this.Content);
             this.pacman.LoadContent(this.Content);
@@ -218,6 +234,10 @@ namespace MyPacman
                             if(this.pacman.Direction.X > 0)
                             {
                                 // Pacman is moving to the right
+                                Maze.BlockTypes blockType = this.currentMaze[
+                                    (uint) MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH),
+                                    (uint) MeasureUtility.ActualYToBlockY(this.pacman.Position.Y)
+                                ];
                             }
                             else
                             {
@@ -349,6 +369,16 @@ namespace MyPacman
                         // User pressed S
                         // (De)activate sounds
                         this.soundsActivated = !this.soundsActivated;
+
+                        if(this.soundsActivated)
+                        {
+                            Random r = new Random();
+                            MediaPlayer.Play(this.songsList[r.Next(0, this.songsList.Count - 1)]);
+                        }
+                        else
+                        {
+                            MediaPlayer.Stop();
+                        }
                     }
                     else if(keyboardState.IsKeyDown(Keys.Q))
                     {

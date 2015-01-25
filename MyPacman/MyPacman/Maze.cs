@@ -206,15 +206,30 @@ namespace MyPacman
             }
         }
 
+        /// <summary>
+        /// Holds Pacman's start point.
+        /// </summary>
         protected readonly Vector2 pacmanStartPosition;
 
+        /// <summary>
+        /// Gets Pacman's start point.
+        /// </summary>
+        /// <returns>Pacman's start point.</returns>
         public Vector2 GetPacmanStartPosition()
         {
             return this.pacmanStartPosition;
         }
 
+        /// <summary>
+        /// Holds the ghosts' start points.
+        /// </summary>
         protected readonly Vector2[] ghostsStartPosition;
 
+        /// <summary>
+        /// Gets the ghosts' start points.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>Ghost's start point.</returns>
         public Vector2 GetGhostStartPosition(Game.GhostsIndex index)
         {
             return this.ghostsStartPosition[(int) index];
@@ -569,6 +584,12 @@ namespace MyPacman
             }
         }
 
+        /// <summary>
+        /// Gets a bounding box associated with a cell.
+        /// </summary>
+        /// <param name="x">Cell's abscissa.</param>
+        /// <param name="y">Cell's ordinate.</param>
+        /// <returns>Cell's bounding box.</returns>
         public BoundingBox GetBoundingBoxAt(uint x, uint y)
         {
             if(x < this.width && y < this.height)
