@@ -12,18 +12,19 @@ namespace MyPacman
 {
     public class Pacman : Sprite
     {
-        protected enum MovementDirection : byte
-        {
-            LEFT,
-            RIGHT,
-            UP,
-            DOWN
-        };
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Game.MovementDirection lastMovementDirection;
 
-        protected MovementDirection lastMovementDirection;
-
+        /// <summary>
+        /// 
+        /// </summary>
         protected int currentFrame;
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected float elapsedTime;
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace MyPacman
         /// </summary>
         public override void Initialize()
         {
-            this.lastMovementDirection = MovementDirection.LEFT;
+            this.lastMovementDirection = Game.MovementDirection.LEFT;
             this.currentFrame = 0;
         }
 
@@ -83,22 +84,22 @@ namespace MyPacman
             if(state.IsKeyDown(Keys.Left))
             {
                 this.direction = -Vector2.UnitX;
-                this.lastMovementDirection = MovementDirection.LEFT;
+                this.lastMovementDirection = Game.MovementDirection.LEFT;
             }
             else if (state.IsKeyDown(Keys.Up))
             {
                 this.direction = -Vector2.UnitY;
-                this.lastMovementDirection = MovementDirection.UP;
+                this.lastMovementDirection = Game.MovementDirection.UP;
             }
             else if (state.IsKeyDown(Keys.Right))
             {
                 this.direction = Vector2.UnitX;
-                this.lastMovementDirection = MovementDirection.RIGHT;
+                this.lastMovementDirection = Game.MovementDirection.RIGHT;
             }
             else if (state.IsKeyDown(Keys.Down))
             {
                 this.direction = Vector2.UnitY;
-                this.lastMovementDirection = MovementDirection.DOWN;
+                this.lastMovementDirection = Game.MovementDirection.DOWN;
             }
             else
             {
@@ -106,11 +107,16 @@ namespace MyPacman
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="spriteBatch"></param>
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             switch(this.lastMovementDirection)
             {
-                case MovementDirection.LEFT:
+                case Game.MovementDirection.LEFT:
                     spriteBatch.Draw(
                         this.texture,
                         this.position,
@@ -119,7 +125,7 @@ namespace MyPacman
                     );
                 break;
 
-                case MovementDirection.RIGHT:
+                case Game.MovementDirection.RIGHT:
                     spriteBatch.Draw(
                         this.texture,
                         this.position,
@@ -128,7 +134,7 @@ namespace MyPacman
                     );
                 break;
 
-                case MovementDirection.UP:
+                case Game.MovementDirection.UP:
                     spriteBatch.Draw(
                             this.texture,
                             this.position,
@@ -137,7 +143,7 @@ namespace MyPacman
                         );
                 break;
 
-                case MovementDirection.DOWN:
+                case Game.MovementDirection.DOWN:
                     spriteBatch.Draw(
                         this.texture,
                         this.position,
@@ -148,17 +154,21 @@ namespace MyPacman
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public BoundingBox GetBoundingBox()
         {
             return new BoundingBox(
                 new Vector3(
-                    this.position.X + 1,
-                    this.position.Y + 1,
+                    this.position.X,
+                    this.position.Y,
                     0
                 ),
                 new Vector3(
-                    this.position.X + MeasureUtility.BLOCK_WIDTH - 2,
-                    this.position.Y + MeasureUtility.BLOCK_HEIGHT - 2,
+                    this.position.X + MeasureUtility.BLOCK_WIDTH - 1,
+                    this.position.Y + MeasureUtility.BLOCK_HEIGHT - 1,
                     0
                 )
             );

@@ -604,7 +604,7 @@ namespace MyPacman
                                 0
                             ),
                             new Vector3(
-                                MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH,
+                                MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH - 1,
                                 MeasureUtility.BlockYToActualY(y) + 15,
                                 0
                             )
@@ -613,7 +613,7 @@ namespace MyPacman
                     case BlockTypes.WALL:
                         return new BoundingBox(
                             new Vector3(MeasureUtility.BlockXToActualX(x), MeasureUtility.BlockYToActualY(y), 0),
-                            new Vector3(MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH, MeasureUtility.BlockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT, 0)
+                            new Vector3(MeasureUtility.BlockXToActualX(x) + MeasureUtility.BLOCK_WIDTH - 1, MeasureUtility.BlockYToActualY(y) + MeasureUtility.BLOCK_HEIGHT - 1, 0)
                         );
 
                     case BlockTypes.PELLET:

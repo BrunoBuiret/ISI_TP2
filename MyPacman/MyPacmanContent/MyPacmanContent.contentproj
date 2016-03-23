@@ -182,13 +182,23 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\google-level.lvl">
-      <Name>google-level</Name>
+    <None Include="data\level-4.lvl">
+      <Name>level-4</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Processor>PassThroughProcessor</Processor>
     </None>
-    <None Include="data\simple-level.lvl">
-      <Name>simple-level</Name>
+    <None Include="data\level-2.lvl">
+      <Name>level-2</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Processor>PassThroughProcessor</Processor>
+    </None>
+    <None Include="data\level-3.lvl">
+      <Name>level-3</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Processor>PassThroughProcessor</Processor>
+    </None>
+    <None Include="data\level-1.lvl">
+      <Name>level-1</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Processor>PassThroughProcessor</Processor>
     </None>
@@ -219,6 +229,20 @@
       <Name>door</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="sounds\on-pacman-win.wav">
+      <Name>on-pacman-win</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="sounds\on-energizer-eaten.wav">
+      <Name>on-energizer-eaten</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

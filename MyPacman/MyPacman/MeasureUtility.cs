@@ -19,6 +19,14 @@ namespace MyPacman
         /// </summary>
         public const float BLOCK_HEIGHT = 20f;
 
+        public static uint mazeWidth = 0;
+
+        public static uint mazeHeight = 0;
+
+        public static uint totalWidth = 0;
+
+        public static uint totalHeight = 0;
+
         /// <summary>
         /// Converts a block abscissa to an actual abscissa.
         /// </summary>
@@ -27,6 +35,7 @@ namespace MyPacman
         public static float BlockXToActualX(float x)
         {
             return x * MeasureUtility.BLOCK_WIDTH;
+            // return (MeasureUtility.totalWidth - MeasureUtility.mazeWidth * MeasureUtility.BLOCK_WIDTH) / 2 + x * MeasureUtility.BLOCK_WIDTH;
         }
 
         /// <summary>
@@ -37,6 +46,7 @@ namespace MyPacman
         public static float ActualXToBlockX(float x)
         {
             return x / MeasureUtility.BLOCK_WIDTH;
+            // return (x - (MeasureUtility.totalWidth - MeasureUtility.mazeWidth * MeasureUtility.BLOCK_WIDTH) / 2) / MeasureUtility.BLOCK_WIDTH;
         }
 
         /// <summary>

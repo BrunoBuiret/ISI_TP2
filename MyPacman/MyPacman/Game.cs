@@ -53,6 +53,14 @@ namespace MyPacman
             PINKY = 3
         }
 
+        public enum MovementDirection : byte
+        {
+            LEFT,
+            RIGHT,
+            UP,
+            DOWN
+        };
+
         /// <summary>
         /// Holds a reference to the graphics device manager.
         /// </summary>
@@ -83,6 +91,12 @@ namespace MyPacman
 
         protected Vector2[] livesPositions;
 
+        protected SoundEffect onPacmanDead;
+
+        protected SoundEffect onPacmanWin;
+
+        protected SoundEffect onEnergizerEaten;
+
         //==================================================
 
         protected GameState currentState;
@@ -93,6 +107,12 @@ namespace MyPacman
 
         protected KeyboardState previousKeyboardState;
 
+        protected List<Maze> mazesList;
+
+        protected Boolean areGhostsVulnerable;
+
+        protected TimeSpan vulnerableGhostsBeginning;
+
         //==================================================
 
         protected Byte remainingLives;
@@ -100,8 +120,6 @@ namespace MyPacman
         protected UInt32 currentScore;
 
         protected Byte currentLevel;
-
-        protected Maze currentMaze;
 
         protected Pacman pacman;
 
@@ -115,6 +133,9 @@ namespace MyPacman
             this.graphics = new GraphicsDeviceManager(this);
             this.graphics.PreferredBackBufferHeight = 600;
             this.Content.RootDirectory = "Content";
+
+            MeasureUtility.totalWidth = (uint) this.graphics.PreferredBackBufferWidth;
+            MeasureUtility.totalHeight = (uint) this.graphics.PreferredBackBufferHeight;
         }
 
         /// <summary>
@@ -129,6 +150,14 @@ namespace MyPacman
             this.currentState = GameState.MENU;
             this.soundsActivated = false;
             this.songsList = new List<Song>();
+            this.previousKeyboardState = Keyboard.GetState();
+            this.mazesList = new List<Maze>();
+            foreach(String fileName in Directory.GetFiles(this.Content.RootDirectory + @"\data\", "*.lvl"))
+            {
+                this.mazesList.Add(Maze.Load(fileName));
+            }
+            this.areGhostsVulnerable = false;
+            this.vulnerableGhostsBeginning = TimeSpan.Zero;
             this.livesPositions = new Vector2[8];
             this.livesPositions[0] = new Vector2(392, 4);
             this.livesPositions[1] = new Vector2(364, 14);
@@ -138,7 +167,6 @@ namespace MyPacman
             this.livesPositions[5] = new Vector2(363, 63);
             this.livesPositions[6] = new Vector2(418, 63);
             this.livesPositions[7] = new Vector2(392, 73);
-            this.currentMaze = Maze.Load(this.Content.RootDirectory + @"\data\simple-level.lvl");
             this.pacman = new Pacman();
             this.pacman.Initialize();
             this.ghosts = new Ghost[4];
@@ -161,6 +189,7 @@ namespace MyPacman
 
             // TODO: use this.Content to load your game content here
             this.uiFont = this.Content.Load<SpriteFont>(@"fonts\ui-font");
+
             this.uiMenuSoundsOnTexture = this.Content.Load<Texture2D>(@"images\ui-menu-sounds-on");
             this.uiMenuSoundsOffTexture = this.Content.Load<Texture2D>(@"images\ui-menu-sounds-off");
             this.uiHelpTexture = this.Content.Load<Texture2D>(@"images\ui-help");
@@ -182,7 +211,15 @@ namespace MyPacman
             this.songsList.Add(this.Content.Load<Song>(@"sounds\night-elf-2"));
             this.songsList.Add(this.Content.Load<Song>(@"sounds\night-elf-3"));
 
-            this.currentMaze.LoadContent(this.Content);
+            this.onPacmanDead = this.Content.Load<SoundEffect>(@"sounds\on-pacman-dead");
+            this.onPacmanWin = this.Content.Load<SoundEffect>(@"sounds\on-pacman-win");
+            this.onEnergizerEaten = this.Content.Load<SoundEffect>(@"sounds\on-energizer-eaten");
+
+            foreach(Maze maze in this.mazesList)
+            {
+                maze.LoadContent(this.Content);
+            }
+
             this.pacman.LoadContent(this.Content);
             
             foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
@@ -227,38 +264,118 @@ namespace MyPacman
                         // Update the game
                         this.pacman.HandleKeyboard(keyboardState);
 
-                        // TODO: Handle collisions by overriding pacman's direction
-                        if(this.pacman.Direction.X != 0)
+                        // Handle collisions
+                        if (this.pacman.Direction.X != 0)
                         {
                             // Pacman is moving horizontally
-                            if(this.pacman.Direction.X > 0)
+                            if (this.pacman.Direction.X > 0)
                             {
                                 // Pacman is moving to the right
-                                Maze.BlockTypes blockType = this.currentMaze[
-                                    (uint) MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH),
-                                    (uint) MeasureUtility.ActualYToBlockY(this.pacman.Position.Y)
-                                ];
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.RIGHT,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y)
+                                );
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.RIGHT,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y + MeasureUtility.BLOCK_HEIGHT - 1)
+                                );
                             }
                             else
                             {
                                 // Pacman is moving to the left
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.LEFT,
+                                    (uint) MeasureUtility.ActualXToBlockX(this.pacman.Position.X - 1),
+                                    (uint) MeasureUtility.ActualYToBlockY(this.pacman.Position.Y)
+                                );
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.RIGHT,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X - 1),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y + MeasureUtility.BLOCK_HEIGHT - 1)
+                                );
                             }
                         }
-                        else if(this.pacman.Direction.Y != 0)
+                        else if (this.pacman.Direction.Y != 0)
                         {
                             // Pacman is moving vertically
-                            if(this.pacman.Direction.Y > 0)
+                            if (this.pacman.Direction.Y > 0)
                             {
                                 // Pacman is going down
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.DOWN,
+                                    (uint) MeasureUtility.ActualXToBlockX(this.pacman.Position.X),
+                                    (uint) MeasureUtility.ActualYToBlockY(this.pacman.Position.Y + MeasureUtility.BLOCK_HEIGHT)
+                                );
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.DOWN,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH - 1),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y + MeasureUtility.BLOCK_HEIGHT)
+                                );
                             }
                             else
                             {
                                 // Pacman is going up
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.UP,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y - 1)
+                                );
+                                this.HandleCollision(
+                                    gameTime,
+                                    MovementDirection.UP,
+                                    (uint)MeasureUtility.ActualXToBlockX(this.pacman.Position.X + MeasureUtility.BLOCK_WIDTH - 1),
+                                    (uint)MeasureUtility.ActualYToBlockY(this.pacman.Position.Y - 1)
+                                );
                             }
                         }
 
-                        // Update Pacman's position if needed
+                        // Update Pacman's position
                         this.pacman.Update(gameTime);
+
+                        // Update the ghosts' position
+                        foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
+                        {
+                            this.ghosts[index].Update(gameTime);
+                        }
+
+                        // Is pacman touched by a ghost ?
+                        BoundingBox pacmanBoundingBox = this.pacman.GetBoundingBox();
+
+                        foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
+                        {
+                            if(pacmanBoundingBox.Intersects(this.ghosts[index].GetBoundingBox()) && this.remainingLives > 0)
+                            {
+                                if(!this.areGhostsVulnerable)
+                                {
+                                    this.remainingLives--;
+                                    this.pacman.Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetPacmanStartPosition());
+                                    this.pacman.Direction = Vector2.Zero;
+
+                                    foreach (byte subIndex in Enum.GetValues(typeof(GhostsIndex)))
+                                    {
+                                        this.ghosts[subIndex].Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetGhostStartPosition((GhostsIndex) subIndex));
+                                        this.ghosts[subIndex].Direction = Vector2.Zero;
+                                    }
+
+                                    break;
+                                }
+                                else
+                                {
+                                    this.currentScore += 200;
+                                    this.ghosts[index].Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetGhostStartPosition((GhostsIndex) index));
+                                    this.ghosts[index].Direction = Vector2.Zero;
+                                }
+                            }
+                        }
 
                         // Has the user lost?
                         if (this.remainingLives == 0)
@@ -266,7 +383,31 @@ namespace MyPacman
                             this.currentState = GameState.SCORE;
                         }
 
-                        #region DEBUG_UI
+                        // Is the level completed?
+                        if(this.mazesList[this.currentLevel - 1].PelletsNumber == 0)
+                        {
+                            if(this.currentLevel < this.mazesList.Count)
+                            {
+                                this.currentLevel++;
+
+                                this.pacman.Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetPacmanStartPosition());
+                                this.pacman.Direction = Vector2.Zero;
+
+                                foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
+                                {
+                                    this.ghosts[index].Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetGhostStartPosition((GhostsIndex)index));
+                                    this.ghosts[index].Direction = Vector2.Zero;
+                                    this.ghosts[index].CurrentMaze = this.mazesList[this.currentLevel - 1];
+                                }
+                            }
+                            else
+                            {
+                                this.currentState = GameState.SCORE;
+                            }
+                        }
+
+                        #if DEBUG
+                        // Activate cheat codes if it is in debug mode
                         if(keyboardState.IsKeyDown(Keys.Add))
                         {
                             this.currentScore += 100000;
@@ -283,15 +424,19 @@ namespace MyPacman
                         {
                             this.remainingLives--;
                         }
-                        else if(keyboardState.IsKeyDown(Keys.Back) && this.currentLevel > 0)
+                        else if(keyboardState.IsKeyDown(Keys.PageDown) && this.currentLevel > 0 && this.previousKeyboardState.IsKeyUp(Keys.PageDown))
                         {
                             this.currentLevel--;
                         }
-                        else if(keyboardState.IsKeyDown(Keys.Insert) && this.currentLevel < 255)
+                        else if(keyboardState.IsKeyDown(Keys.PageUp) && this.currentLevel < 255 && this.previousKeyboardState.IsKeyUp(Keys.PageUp))
                         {
                             this.currentLevel++;
                         }
-                        #endregion
+                        else if(keyboardState.IsKeyDown(Keys.F1) && this.previousKeyboardState.IsKeyUp(Keys.F1))
+                        {
+                            this.areGhostsVulnerable = !this.areGhostsVulnerable;
+                        }
+                        #endif
                     }
                 break;
 
@@ -345,18 +490,26 @@ namespace MyPacman
                     {
                         // User pressed N
                         // Create a new game
+                        Random r = new Random();
+
                         this.currentState = GameState.PLAYING;
                         this.currentScore = 0;
                         this.remainingLives = 3;
                         this.currentLevel = 1;
-                        this.pacman.Position = MeasureUtility.blockVector2ToActualVector2(currentMaze.GetPacmanStartPosition());
+                        this.pacman.Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetPacmanStartPosition());
+                        this.pacman.Direction = Vector2.Zero;
                         this.pacman.Speed = 0.1f;
 
                         foreach(byte index in Enum.GetValues(typeof(GhostsIndex)))
                         {
-                            this.ghosts[index].Position = MeasureUtility.blockVector2ToActualVector2(this.currentMaze.GetGhostStartPosition((GhostsIndex) index));
+                            this.ghosts[index].Position = MeasureUtility.blockVector2ToActualVector2(this.mazesList[this.currentLevel - 1].GetGhostStartPosition((GhostsIndex) index));
+                            this.ghosts[index].Direction = Vector2.Zero;
                             this.ghosts[index].Speed = 0.1f;
+                            this.ghosts[index].CurrentMaze = this.mazesList[this.currentLevel - 1];
                         }
+
+                        MeasureUtility.mazeWidth = this.mazesList[this.currentLevel - 1].Width;
+                        MeasureUtility.mazeHeight = this.mazesList[this.currentLevel - 1].Height;
                     }
                     else if(keyboardState.IsKeyDown(Keys.H))
                     {
@@ -430,10 +583,10 @@ namespace MyPacman
                         goldColor
                     );
 
-                    textDimensions = this.uiFont.MeasureString(this.currentLevel.ToString());
+                    textDimensions = this.uiFont.MeasureString(this.currentLevel.ToString() + " / " + this.mazesList.Count.ToString());
                     this.spriteBatch.DrawString(
                         this.uiFont,
-                        this.currentLevel.ToString(),
+                        this.currentLevel.ToString() + " / " + this.mazesList.Count.ToString(),
                         new Vector2(772 - textDimensions.X, 3 + (36 - textDimensions.Y) / 2),
                         goldColor
                     );
@@ -448,7 +601,7 @@ namespace MyPacman
                     }
 
                     // Draw the maze
-                    this.currentMaze.Draw(gameTime, this.spriteBatch);
+                    this.mazesList[this.currentLevel - 1].Draw(gameTime, this.spriteBatch);
 
                     // Draw the ghosts
                     foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
@@ -554,6 +707,95 @@ namespace MyPacman
             this.spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="direction"></param>
+        /// <param name="nextX"></param>
+        /// <param name="nextY"></param>
+        protected void HandleCollision(GameTime gameTime, MovementDirection direction, uint nextX, uint nextY)
+        {
+            try
+            {
+                // Get the block type
+                Maze.BlockTypes blockType = this.mazesList[this.currentLevel - 1][nextX, nextY];
+
+                // And then react according to it
+                BoundingBox blockBoundingBox = this.mazesList[this.currentLevel - 1].GetBoundingBoxAt(nextX, nextY);
+                BoundingBox pacmanBoundingBox = this.pacman.GetBoundingBox();
+
+                switch(blockType)
+                {
+                    case Maze.BlockTypes.WALL:
+                    case Maze.BlockTypes.DOOR:
+                        // Translate pacman's bounding box to match its next movement
+                        switch(direction)
+                        {
+                            case MovementDirection.LEFT:
+                                pacmanBoundingBox.Min.X--;
+                                pacmanBoundingBox.Max.X--;
+                            break;
+
+                            case MovementDirection.UP:
+                                pacmanBoundingBox.Min.Y--;
+                                pacmanBoundingBox.Max.Y--;
+                            break;
+
+                            case MovementDirection.RIGHT:
+                                pacmanBoundingBox.Min.X++;
+                                pacmanBoundingBox.Max.X++;
+                            break;
+
+                            case MovementDirection.DOWN:
+                                pacmanBoundingBox.Min.Y++;
+                                pacmanBoundingBox.Max.Y++;
+                            break;
+                        }
+
+                        // Then, then if it intersects with the obstacle's
+                        if(pacmanBoundingBox.Intersects(blockBoundingBox))
+                        {
+                            this.pacman.Direction = Vector2.Zero;
+                        }
+                    break;
+
+                    case Maze.BlockTypes.PELLET:
+                        if(pacmanBoundingBox.Intersects(blockBoundingBox))
+                        {
+                            this.mazesList[this.currentLevel - 1][nextX, nextY] = Maze.BlockTypes.EMPTY;
+                            this.mazesList[this.currentLevel - 1].PelletsNumber--;
+                            this.currentScore += 10;
+                        }
+                    break;
+
+                    case Maze.BlockTypes.ENERGIZER:
+                        if(pacmanBoundingBox.Intersects(blockBoundingBox))
+                        {
+                            this.mazesList[this.currentLevel - 1][nextX, nextY] = Maze.BlockTypes.EMPTY;
+                            this.areGhostsVulnerable = true;
+                            this.vulnerableGhostsBeginning = gameTime.TotalGameTime;
+
+                            foreach (byte index in Enum.GetValues(typeof(GhostsIndex)))
+                            {
+                                this.ghosts[index].IsVulnerable = true;
+                            }
+
+                            if(this.soundsActivated)
+                            {
+                                this.onEnergizerEaten.Play();
+                            }
+                        }
+                    break;
+                }
+            }
+            catch(IndexOutOfRangeException)
+            {
+                // Stop pacman from exiting the maze
+                this.pacman.Direction = Vector2.Zero;
+            }
         }
     }
 }
